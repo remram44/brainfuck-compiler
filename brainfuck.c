@@ -34,7 +34,6 @@ int main(int argc, char **argv)
 {
     const char *output = NULL;
     const char *input = NULL;
-    const char std[1];
     for(argv++; *argv != NULL; argv++)
     {
         if( (strcmp(*argv, "-o") == 0) || (strcmp(*argv, "--output") == 0) )
@@ -52,15 +51,6 @@ int main(int argc, char **argv)
                 help(stderr);
                 return 1;
             }
-        }
-        else if(strcmp(*argv, "--stdout") == 0)
-        {
-            if(output)
-            {
-                fprintf(stderr, "Multiple outputs specified\n");
-                return 1;
-            }
-            output = std;
         }
         else if( (strcmp(*argv, "-h") == 0) || (strcmp(*argv, "--help") == 0) )
         {
@@ -96,9 +86,10 @@ int main(int argc, char **argv)
     }
 
     if(!output)
-        output = std;
-    if(!input)
-        input = std;
+    {
+        fprintf(stderr, "No output specified\n");
+        return 1;
+    }
 
     {
         FILE *in;
@@ -137,8 +128,13 @@ int compile(FILE *in, const char *outfile)
     int data = 0;
     unsigned int line = 1;
 
-    /* TODO : temporary file */
-    FILE *tmp = fopen("tmp.s", "w");
+    /* temporary file */
+    char tmpfile[L_tmpnam + 2];
+    FILE *tmp;
+    tmpnam(tmpfile);
+
+    strcat(tmpfile, ".s");
+    tmp = fopen(tmpfile, "w");
     begin_code(tmp);
 
     while((c = fgetc(in)) != EOF)
@@ -208,7 +204,13 @@ int compile(FILE *in, const char *outfile)
     }
     fclose(tmp);
 
-    /* TODO : assemble */
+    {
+        char cmd[512];
+        sprintf(cmd, "gcc %s -o %s", tmpfile, outfile);
+        system(cmd);
+    }
+
+    remove(tmpfile);
 
     return 0;
 }

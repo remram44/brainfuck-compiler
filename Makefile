@@ -13,8 +13,6 @@ brainfuck.o: brainfuck.c
 
 hello_world.exe: bfc.exe hello_world.bf
 	bfc.exe hello_world.bf -o hello_world.exe
-	gcc tmp.s -o hello_world.exe
-	del /f tmp.s
 
 clean:
 	del /f brainfuck.o bfc.exe
