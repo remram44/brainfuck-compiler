@@ -25,7 +25,11 @@ int compile(FILE *in, const char *outfile);
 
 void help(FILE *out)
 {
-    fprintf(out, "HELP\n");
+    fprintf(out, "bfc: brainfuck compiler\n"
+        "Usage: bfc [options] -o executable file.bf\n"
+        "  -h, --help : show this help and exit\n"
+        "  -v, --version : display version information and exit\n"
+        "  --strict : only accept command and newline characters\n");
 }
 
 int strict = 0;
