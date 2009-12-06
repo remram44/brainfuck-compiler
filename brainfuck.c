@@ -282,19 +282,21 @@ int write_op(FILE *out, enum Mode mode, int data)
         gen++;
         idx++;
         fprintf(out,
-            "LOOP%u:\n",
-            labels[idx-1]);
+            "LOOP%u_S:\n"
+            "    movl 12(%%esp), %%eax\n"
+            "    movl (%%eax), %%eax\n"
+            "    testl %%eax, %%eax\n"
+            "    je LOOP%u_E\n",
+            labels[idx-1], labels[idx-1]);
         break;
     case RIGHT_LOOP: DEBUG_OUT("RIGHT_LOOP\n");
         if(idx == 0)
             return 1;
         idx--;
         fprintf(out,
-            "    movl 12(%%esp), %%eax\n"
-            "    movl (%%eax), %%eax\n"
-            "    testl %%eax, %%eax\n"
-            "    jne LOOP%u\n",
-            labels[idx]);
+            "    jmp LOOP%u_S\n"
+            "LOOP%u_E:\n",
+            labels[idx], labels[idx]);
         break;
     case OUTPUT: DEBUG_OUT("OUTPUT\n");
         fprintf(out,
